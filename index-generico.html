@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LALALOU - KPI Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'lalalou': {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        'accent': {
+                            50: '#fef2f2',
+                            100: '#fee2e2',
+                            200: '#fecaca',
+                            300: '#fca5a5',
+                            400: '#f87171',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c',
+                            800: '#991b1b',
+                            900: '#7f1d1d',
+                        }
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                        'display': ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+        }
+        
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .drag-over {
+            border-color: #0ea5e9 !important;
+            background-color: rgba(14, 165, 233, 0.05) !important;
+        }
+        
+        .loading-shimmer {
+            background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .sidebar-transition {
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar-closed {
+                transform: translateX(-100%);
+            }
+        }
+    </style>
+</head>
+<body class="h-full bg-gray-50 font-sans" x-data="dashboardApp()">
+    <!-- Loading Overlay -->
+    <div x-show="loading" x-transition class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full mx-4">
+            <div class="flex items-center space-x-4">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-lalalou-600"></div>
+                <div>
+                    <p class="font-semibold text-gray-800" x-text="loadingMessage">Procesando...</p>
+                    <p class="text-sm text-gray-600">Por favor espere</p>
+                </div>
+            </div>
+            <div class="mt-4 w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-lalalou-600 h-2 rounded-full transition-all duration-300" :style="`width: ${loadingProgress}%`"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div x-show="toast.show" x-transition class="fixed top-4 right-4 z-40">
+        <div class="bg-white border-l-4 p-4 rounded shadow-lg max-w-sm" 
+             :class="toast.type === 'success' ? 'border-green-500' : toast.type === 'error' ? 'border-red-500' : 'border-lalalou-500'">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="text-lg" :class="toast.type === 'success' ? 'fas fa-check-circle text-green-500' : toast.type === 'error' ? 'fas fa-exclamation-triangle text-red-500' : 'fas fa-info-circle text-lalalou-500'"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-gray-800" x-text="toast.message"></p>
+                </div>
+                <button @click="toast.show = false" class="ml-auto">
+                    <i class="fas fa-times text-gray-400 hover:text-gray-600"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="bg-white shadow-lg sidebar-transition" 
+             :class="sidebarOpen ? 'w-64' : 'w-0 md:w-16'" 
+             class="relative z-30">
+            <div class="flex flex-col h-full">
+                <!-- Logo -->
+                <div class="flex items-center px-6 py-4 border-b border-gray-200">
+                    <div class="gradient-bg w-8 h-8 rounded flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">L</span>
+                    </div>
+                    <div class="ml-3" x-show="sidebarOpen" x-transition>
+                        <h1 class="text-lg font-semibold text-gray-800">LALALOU</h1>
+                        <p class="text-xs text-gray-500">KPI Dashboard</p>
+                    </div>
+                </div>
+                
+                <!-- Navigation -->
+                <nav class="flex-1 px-4 py-6 space-y-2">
+                    <template x-for="(item, index) in navigation" :key="index">
+                        <a href="#" @click="activeTab = item.key" 
+                           class="flex items-center px-3 py-2 rounded-lg transition-colors"
+                           :class="activeTab === item.key ? 'bg-lalalou-100 text-lalalou-700' : 'text-gray-600 hover:bg-gray-100'">
+                            <i :class="item.icon" class="w-5"></i>
+                            <span class="ml-3" x-show="sidebarOpen" x-transition x-text="item.label"></span>
+                        </a>
+                    </template>
+                </nav>
+                
+                <!-- User Section -->
+                <div class="px-4 py-4 border-t border-gray-200">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-lalalou-500 rounded-full flex items-center justify-center">
+                            <span class="text-white text-sm font-semibold">U</span>
+                        </div>
+                        <div class="ml-3" x-show="sidebarOpen" x-transition>
+                            <p class="text-sm font-medium text-gray-700">Usuario</p>
+                            <p class="text-xs text-gray-500">Administrador</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <header class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <h2 class="text-xl font-semibold text-gray-800" x-text="getTabTitle()"></h2>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <!-- Date Range Picker -->
+                        <div class="flex items-center space-x-2 bg-gray-50 px-3 py-2 rounded-lg">
+                            <i class="fas fa-calendar-alt text-gray-500"></i>
+                            <select x-model="dateRange" class="bg-transparent text-sm border-none focus:outline-none">
+                                <option value="7d">Últimos 7 días</option>
+                                <option value="30d">Últimos 30 días</option>
+                                <option value="90d">Últimos 90 días</option>
+                                <option value="1y">Último año</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Export Button -->
+                        <button @click="exportData()" class="bg-lalalou-600 text-white px-4 py-2 rounded-lg hover:bg-lalalou-700 transition-colors">
+                            <i class="fas fa-download mr-2"></i>Exportar
+                        </button>
+                        
+                        <!-- Refresh Button -->
+                        <button @click="refreshData()" class="text-gray-500 hover:text-gray-700 p-2">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <main class="flex-1 overflow-auto p-6">
+                <!-- Upload Tab -->
+                <div x-show="activeTab === 'upload'" class="space-y-6">
+                    <!-- Upload Zone -->
+                    <div class="max-w-2xl mx-auto">
+                        <div @dragover.prevent @dragenter.prevent @drop.prevent="handleDrop($event)"
+                             @dragover="$el.classList.add('drag-over')"
+                             @dragleave="$el.classList.remove('drag-over')"
+                             class="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-lalalou-400 transition-colors">
+                            <div class="space-y-4">
+                                <div class="text-6xl text-gray-400">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold text-gray-700">Cargar archivo Excel</h3>
+                                    <p class="text-gray-500 mt-2">Arrastra y suelta tu archivo aquí, o haz clic para seleccionar</p>
+                                </div>
+                                <div class="flex justify-center">
+                                    <label class="bg-lalalou-600 text-white px-6 py-2 rounded-lg hover:bg-lalalou-700 cursor-pointer transition-colors">
+                                        <i class="fas fa-plus mr-2"></i>Seleccionar archivo
+                                        <input type="file" accept=".xlsx,.xls" @change="handleFileSelect($event)" class="hidden">
+                                    </label>
+                                </div>
+                                <p class="text-sm text-gray-400">Formatos soportados: .xlsx, .xls (máx. 10MB)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- File List -->
+                    <div x-show="files.length > 0" class="max-w-4xl mx-auto">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Archivos cargados</h3>
+                        <div class="bg-white rounded-lg shadow card-shadow">
+                            <template x-for="(file, index) in files" :key="index">
+                                <div class="flex items-center justify-between p-4 border-b border-gray-100 last:border-b-0">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-file-excel text-green-600"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-800" x-text="file.name"></p>
+                                            <p class="text-sm text-gray-500" x-text="formatFileSize(file.size)"></p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <span class="px-3 py-1 rounded-full text-xs font-medium"
+                                              :class="file.status === 'processed' ? 'bg-green-100 text-green-700' : 
+                                                     file.status === 'processing' ? 'bg-yellow-100 text-yellow-700' :
+                                                     file.status === 'error' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'"
+                                              x-text="file.status === 'processed' ? 'Procesado' : 
+                                                     file.status === 'processing' ? 'Procesando...' :
+                                                     file.status === 'error' ? 'Error' : 'Pendiente'">
+                                        </span>
+                                        <button @click="processFile(index)" 
+                                                x-show="file.status === 'uploaded'"
+                                                class="bg-lalalou-600 text-white px-3 py-1 rounded text-sm hover:bg-lalalou-700">
+                                            Procesar
+                                        </button>
+                                        <button @click="removeFile(index)" class="text-red-500 hover:text-red-700">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Tab -->
+                <div x-show="activeTab === 'dashboard'" class="space-y-6">
+                    <!-- KPI Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <template x-for="(kpi, index) in kpis" :key="index">
+                            <div class="bg-white rounded-lg shadow card-shadow p-6">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-800" x-text="kpi.title"></h3>
+                                        <p class="text-2xl font-bold text-lalalou-600 mt-2" x-text="kpi.value"></p>
+                                    </div>
+                                    <div class="w-12 h-12 bg-lalalou-100 rounded-lg flex items-center justify-center">
+                                        <i :class="kpi.icon" class="text-lalalou-600 text-xl"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-4 flex items-center">
+                                    <span class="text-sm font-medium" 
+                                          :class="kpi.change >= 0 ? 'text-green-600' : 'text-red-600'"
+                                          x-text="(kpi.change >= 0 ? '+' : '') + kpi.change + '%'"></span>
+                                    <span class="text-sm text-gray-500 ml-2">vs mes anterior</span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                    
+                    <!-- Charts Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Line Chart -->
+                        <div class="bg-white rounded-lg shadow card-shadow p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Tendencia de Ventas</h3>
+                            <canvas id="lineChart" width="400" height="200"></canvas>
+                        </div>
+                        
+                        <!-- Bar Chart -->
+                        <div class="bg-white rounded-lg shadow card-shadow p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Top Productos</h3>
+                            <canvas id="barChart" width="400" height="200"></canvas>
+                        </div>
+                        
+                        <!-- Pie Chart -->
+                        <div class="bg-white rounded-lg shadow card-shadow p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Distribución por Categoría</h3>
+                            <canvas id="pieChart" width="400" height="200"></canvas>
+                        </div>
+                        
+                        <!-- Doughnut Chart -->
+                        <div class="bg-white rounded-lg shadow card-shadow p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Estado de Stock</h3>
+                            <canvas id="doughnutChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Tab -->
+                <div x-show="activeTab === 'analytics'" class="space-y-6">
+                    <!-- Search and Filters -->
+                    <div class="bg-white rounded-lg shadow card-shadow p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
+                                <div class="relative">
+                                    <input type="text" x-model="searchTerm" placeholder="Buscar productos..."
+                                           class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lalalou-500 focus:border-lalalou-500">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
+                                        <i class="fas fa-search text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
+                                <select x-model="selectedCategory" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lalalou-500">
+                                    <option value="">Todas</option>
+                                    <option value="electronics">Electrónicos</option>
+                                    <option value="clothing">Ropa</option>
+                                    <option value="home">Hogar</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                                <select x-model="selectedStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lalalou-500">
+                                    <option value="">Todos</option>
+                                    <option value="in-stock">En Stock</option>
+                                    <option value="low-stock">Stock Bajo</option>
+                                    <option value="out-of-stock">Sin Stock</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Ordenar por</label>
+                                <select x-model="sortBy" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lalalou-500">
+                                    <option value="name">Nombre</option>
+                                    <option value="stock">Stock</option>
+                                    <option value="sales">Ventas</option>
+                                    <option value="value">Valor</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Table -->
+                    <div class="bg-white rounded-lg shadow card-shadow overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-800">Análisis de Productos</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ventas (30d)</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <template x-for="(product, index) in filteredProducts" :key="index">
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    <div class="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">
+                                                        <i class="fas fa-box text-gray-500"></i>
+                                                    </div>
+                                                    <div class="ml-4">
+                                                        <div class="text-sm font-medium text-gray-900" x-text="product.name"></div>
+                                                        <div class="text-sm text-gray-500" x-text="product.sku"></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="product.category"></td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="product.stock"></td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="product.sales"></td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="'$' + product.value"></td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="px-2 py-1 text-xs font-medium rounded-full"
+                                                      :class="product.status === 'in-stock' ? 'bg-green-100 text-green-800' :
+                                                             product.status === 'low-stock' ? 'bg-yellow-100 text-yellow-800' :
+                                                             'bg-red-100 text-red-800'"
+                                                      x-text="product.status === 'in-stock' ? 'En Stock' :
+                                                             product.status === 'low-stock' ? 'Stock Bajo' :
+                                                             'Sin Stock'">
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="px-6 py-4 border-t border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div class="text-sm text-gray-500">
+                                    Mostrando <span x-text="(currentPage - 1) * itemsPerPage + 1"></span> a 
+                                    <span x-text="Math.min(currentPage * itemsPerPage, filteredProducts.length)"></span> de 
+                                    <span x-text="filteredProducts.length"></span> resultados
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button @click="currentPage = Math.max(1, currentPage - 1)"
+                                            :disabled="currentPage === 1"
+                                            class="px-3 py-2 border border-gray-300 rounded-lg text-sm disabled:opacity-50">
+                                        Anterior
+                                    </button>
+                                    <button @click="currentPage = Math.min(totalPages, currentPage + 1)"
+                                            :disabled="currentPage === totalPages"
+                                            class="px-3 py-2 border border-gray-300 rounded-lg text-sm disabled:opacity-50">
+                                        Siguiente
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historical Tab -->
+                <div x-show="activeTab === 'historical'" class="space-y-6">
+                    <!-- Comparison Controls -->
+                    <div class="bg-white rounded-lg shadow card-shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Comparación Histórica</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Período Base</label>
+                                <input type="month" x-model="basePeriod" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lalalou-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Período Comparación</label>
+                                <input type="month" x-model="comparePeriod" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lalalou-500">
+                            </div>
+                            <div class="flex items-end">
+                                <button @click="compareHistoricalData()" class="w-full bg-lalalou-600 text-white px-4 py-2 rounded-lg hover:bg-lalalou-700">
+                                    <i class="fas fa-chart-line mr-2"></i>Comparar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Comparison Results -->
+                    <div x-show="historicalComparison.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <template x-for="(comparison, index) in historicalComparison" :key="index">
+                            <div class="bg-white rounded-lg shadow card-shadow p-6">
+                                <h4 class="text-lg font-semibold text-gray-800 mb-4" x-text="comparison.metric"></h4>
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Período Base</span>
+                                        <span class="font-semibold" x-text="comparison.baseValue"></span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Período Comparación</span>
+                                        <span class="font-semibold" x-text="comparison.compareValue"></span>
+                                    </div>
+                                    <div class="flex justify-between items-center pt-2 border-t border-gray-200">
+                                        <span class="text-sm text-gray-600">Diferencia</span>
+                                        <span class="font-bold"
+                                              :class="comparison.change >= 0 ? 'text-green-600' : 'text-red-600'"
+                                              x-text="(comparison.change >= 0 ? '+' : '') + comparison.change + '%'"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                    
+                    <!-- Historical Chart -->
+                    <div class="bg-white rounded-lg shadow card-shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Tendencia Histórica</h3>
+                        <canvas id="historicalChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        function dashboardApp() {
+            return {
+                activeTab: 'dashboard',
+                sidebarOpen: true,
+                loading: false,
+                loadingMessage: 'Procesando...',
+                loadingProgress: 0,
+                dateRange: '30d',
+                searchTerm: '',
+                selectedCategory: '',
+                selectedStatus: '',
+                sortBy: 'name',
+                currentPage: 1,
+                itemsPerPage: 10,
+                basePeriod: '',
+                comparePeriod: '',
+                
+                navigation: [
+                    { key: 'dashboard', label: 'Dashboard', icon: 'fas fa-chart-pie' },
+                    { key: 'upload', label: 'Cargar Datos', icon: 'fas fa-upload' },
+                    { key: 'analytics', label: 'Análisis', icon: 'fas fa-chart-bar' },
+                    { key: 'historical', label: 'Histórico', icon: 'fas fa-history' }
+                ],
+                
+                toast: {
+                    show: false,
+                    message: '',
+                    type: 'info'
+                },
+                
+                files: [],
+                
+                kpis: [
+                    { 
+                        title: 'Ventas Totales', 
+                        value: '$124,567', 
+                        change: 12.5, 
+                        icon: 'fas fa-dollar-sign' 
+                    },
+                    { 
+                        title: 'Stock Total', 
+                        value: '8,432', 
+                        change: -3.2, 
+                        icon: 'fas fa-boxes' 
+                    },
+                    { 
+                        title: 'Productos Activos', 
+                        value: '1,248', 
+                        change: 5.8, 
+                        icon: 'fas fa-cube' 
+                    },
+                    { 
+                        title: 'Rotación', 
+                        value: '3.2x', 
+                        change: 8.1, 
+                        icon: 'fas fa-sync-alt' 
+                    }
+                ],
+                
+                products: [
+                    { name: 'iPhone 14 Pro', sku: 'IP14P-128', category: 'Electrónicos', stock: 45, sales: 120, value: 999, status: 'in-stock' },
+                    { name: 'Samsung Galaxy S23', sku: 'SGS23-256', category: 'Electrónicos', stock: 23, sales: 89, value: 899, status: 'low-stock' },
+                    { name: 'MacBook Air M2', sku: 'MBA-M2-256', category: 'Electrónicos', stock: 12, sales: 45, value: 1299, status: 'in-stock' },
+                    { name: 'AirPods Pro 2', sku: 'APP2-WHT', category: 'Electrónicos', stock: 0, sales: 234, value: 249, status: 'out-of-stock' },
+                    { name: 'Nike Air Max 90', sku: 'NAM90-WHT-42', category: 'Ropa', stock: 78, sales: 67, value: 129, status: 'in-stock' },
+                    { name: 'Adidas Ultraboost', sku: 'AUB-BLK-43', category: 'Ropa', stock: 15, sales: 45, value: 179, status: 'low-stock' },
+                    { name: 'Sofá Modular', sku: 'SMD-GRY-3S', category: 'Hogar', stock: 5, sales: 12, value: 899, status: 'low-stock' },
+                    { name: 'Mesa Comedor Roble', sku: 'MCR-150-OAK', category: 'Hogar', stock: 8, sales: 23, value: 549, status: 'in-stock' }
+                ],
+                
+                historicalComparison: [],
+                
+                init() {
+                    this.initializeCharts();
+                    // Simular datos iniciales
+                    this.basePeriod = this.getCurrentMonth(-1);
+                    this.comparePeriod = this.getCurrentMonth(0);
+                },
+                
+                getTabTitle() {
+                    const titles = {
+                        'dashboard': 'Dashboard Principal',
+                        'upload': 'Cargar Datos',
+                        'analytics': 'Análisis Detallado',
+                        'historical': 'Comparación Histórica'
+                    };
+                    return titles[this.activeTab] || 'Dashboard';
+                },
+                
+                get filteredProducts() {
+                    let filtered = this.products;
+                    
+                    // Filtrar por búsqueda
+                    if (this.searchTerm) {
+                        filtered = filtered.filter(product => 
+                            product.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+                            product.sku.toLowerCase().includes(this.searchTerm.toLowerCase())
+                        );
+                    }
+                    
+                    // Filtrar por categoría
+                    if (this.selectedCategory) {
+                        filtered = filtered.filter(product => product.category === this.selectedCategory);
+                    }
+                    
+                    // Filtrar por estado
+                    if (this.selectedStatus) {
+                        filtered = filtered.filter(product => product.status === this.selectedStatus);
+                    }
+                    
+                    // Ordenar
+                    filtered.sort((a, b) => {
+                        switch (this.sortBy) {
+                            case 'name':
+                                return a.name.localeCompare(b.name);
+                            case 'stock':
+                                return b.stock - a.stock;
+                            case 'sales':
+                                return b.sales - a.sales;
+                            case 'value':
+                                return b.value - a.value;
+                            default:
+                                return 0;
+                        }
+                    });
+                    
+                    return filtered;
+                },
+                
+                get totalPages() {
+                    return Math.ceil(this.filteredProducts.length / this.itemsPerPage);
+                },
+                
+                handleDrop(event) {
+                    event.preventDefault();
+                    const files = event.dataTransfer.files;
+                    this.processFiles(files);
+                },
+                
+                handleFileSelect(event) {
+                    const files = event.target.files;
+                    this.processFiles(files);
+                },
+                
+                processFiles(files) {
+                    Array.from(files).forEach(file => {
+                        if (this.validateFile(file)) {
+                            this.files.push({
+                                id: Date.now() + Math.random(),
+                                name: file.name,
+                                size: file.size,
+                                type: file.type,
+                                status: 'uploaded',
+                                file: file
+                            });
+                        }
+                    });
+                },
+                
+                validateFile(file) {
+                    const maxSize = 10 * 1024 * 1024; // 10MB
+                    const allowedTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'];
+                    
+                    if (file.size > maxSize) {
+                        this.showToast('Error: El archivo es demasiado grande (máx. 10MB)', 'error');
+                        return false;
+                    }
+                    
+                    if (!allowedTypes.includes(file.type)) {
+                        this.showToast('Error: Formato de archivo no soportado', 'error');
+                        return false;
+                    }
+                    
+                    return true;
+                },
+                
+                processFile(index) {
+                    const file = this.files[index];
+                    file.status = 'processing';
+                    
+                    this.showLoading('Procesando archivo Excel...', 0);
+                    
+                    // Simular procesamiento
+                    setTimeout(() => {
+                        this.loadingProgress = 30;
+                        this.loadingMessage = 'Analizando estructura...';
+                    }, 500);
+                    
+                    setTimeout(() => {
+                        this.loadingProgress = 60;
+                        this.loadingMessage = 'Extrayendo datos...';
+                    }, 1500);
+                    
+                    setTimeout(() => {
+                        this.loadingProgress = 90;
+                        this.loadingMessage = 'Calculando KPIs...';
+                    }, 2500);
+                    
+                    setTimeout(() => {
+                        this.loadingProgress = 100;
+                        file.status = 'processed';
+                        this.hideLoading();
+                        this.showToast(`Archivo ${file.name} procesado correctamente`, 'success');
+                        this.updateKPIs();
+                    }, 3500);
+                },
+                
+                removeFile(index) {
+                    this.files.splice(index, 1);
+                    this.showToast('Archivo eliminado', 'info');
+                },
+                
+                formatFileSize(bytes) {
+                    if (bytes === 0) return '0 Bytes';
+                    const k = 1024;
+                    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+                    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+                },
+                
+                showLoading(message, progress) {
+                    this.loading = true;
+                    this.loadingMessage = message;
+                    this.loadingProgress = progress;
+                },
+                
+                hideLoading() {
+                    this.loading = false;
+                    this.loadingProgress = 0;
+                },
+                
+                showToast(message, type = 'info') {
+                    this.toast.message = message;
+                    this.toast.type = type;
+                    this.toast.show = true;
+                    
+                    setTimeout(() => {
+                        this.toast.show = false;
+                    }, 4000);
+                },
+                
+                exportData() {
+                    this.showLoading('Generando exportación...', 0);
+                    
+                    setTimeout(() => {
+                        this.loadingProgress = 50;
+                    }, 500);
+                    
+                    setTimeout(() => {
+                        this.loadingProgress = 100;
+                        this.hideLoading();
+                        this.showToast('Datos exportados correctamente', 'success');
+                    }, 1500);
+                },
+                
+                refreshData() {
+                    this.showToast('Actualizando datos...', 'info');
+                    // Simular actualización
+                    setTimeout(() => {
+                        this.updateKPIs();
+                        this.showToast('Datos actualizados', 'success');
+                    }, 1000);
+                },
+                
+                updateKPIs() {
+                    // Simular actualización de KPIs
+                    this.kpis.forEach(kpi => {
+                        const variation = (Math.random() - 0.5) * 10;
+                        kpi.change = parseFloat((kpi.change + variation).toFixed(1));
+                    });
+                },
+                
+                compareHistoricalData() {
+                    if (!this.basePeriod || !this.comparePeriod) {
+                        this.showToast('Seleccione ambos períodos para comparar', 'error');
+                        return;
+                    }
+                    
+                    this.showLoading('Generando comparación...', 0);
+                    
+                    setTimeout(() => {
+                        this.loadingProgress = 50;
+                    }, 500);
+                    
+                    setTimeout(() => {
+                        this.historicalComparison = [
+                            { metric: 'Ventas Totales', baseValue: '$98,432', compareValue: '$124,567', change: 26.5 },
+                            { metric: 'Unidades Vendidas', baseValue: '2,345', compareValue: '2,890', change: 23.2 },
+                            { metric: 'Margen Bruto', baseValue: '34.2%', compareValue: '36.8%', change: 7.6 },
+                            { metric: 'Stock Promedio', baseValue: '8,923', compareValue: '8,432', change: -5.5 },
+                            { metric: 'Rotación', baseValue: '2.8x', compareValue: '3.2x', change: 14.3 },
+                            { metric: 'Días de Cobertura', baseValue: '45', compareValue: '38', change: -15.6 }
+                        ];
+                        this.loadingProgress = 100;
+                        this.hideLoading();
+                        this.showToast('Comparación generada', 'success');
+                    }, 1500);
+                },
+                
+                getCurrentMonth(offset) {
+                    const date = new Date();
+                    date.setMonth(date.getMonth() + offset);
+                    return date.toISOString().slice(0, 7);
+                },
+                
+                initializeCharts() {
+                    this.$nextTick(() => {
+                        this.createLineChart();
+                        this.createBarChart();
+                        this.createPieChart();
+                        this.createDoughnutChart();
+                        this.createHistoricalChart();
+                    });
+                },
+                
+                createLineChart() {
+                    const ctx = document.getElementById('lineChart');
+                    if (!ctx) return;
+                    
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+                            datasets: [{
+                                label: 'Ventas ($)',
+                                data: [65000, 78000, 90000, 85000, 92000, 124567],
+                                borderColor: '#0ea5e9',
+                                backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return '$' + value.toLocaleString();
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                },
+                
+                createBarChart() {
+                    const ctx = document.getElementById('barChart');
+                    if (!ctx) return;
+                    
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['iPhone 14', 'Galaxy S23', 'MacBook Air', 'AirPods Pro', 'iPad Pro'],
+                            datasets: [{
+                                label: 'Ventas',
+                                data: [234, 189, 145, 234, 156],
+                                backgroundColor: [
+                                    '#0ea5e9',
+                                    '#06b6d4',
+                                    '#0891b2',
+                                    '#0e7490',
+                                    '#155e75'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                },
+                
+                createPieChart() {
+                    const ctx = document.getElementById('pieChart');
+                    if (!ctx) return;
+                    
+                    new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['Electrónicos', 'Ropa', 'Hogar', 'Deportes', 'Otros'],
+                            datasets: [{
+                                data: [45, 25, 15, 10, 5],
+                                backgroundColor: [
+                                    '#0ea5e9',
+                                    '#06b6d4',
+                                    '#0891b2',
+                                    '#0e7490',
+                                    '#155e75'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom'
+                                }
+                            }
+                        }
+                    });
+                },
+                
+                createDoughnutChart() {
+                    const ctx = document.getElementById('doughnutChart');
+                    if (!ctx) return;
+                    
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['En Stock', 'Stock Bajo', 'Sin Stock'],
+                            datasets: [{
+                                data: [70, 20, 10],
+                                backgroundColor: [
+                                    '#10b981',
+                                    '#f59e0b',
+                                    '#ef4444'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom'
+                                }
+                            }
+                        }
+                    });
+                },
+                
+                createHistoricalChart() {
+                    const ctx = document.getElementById('historicalChart');
+                    if (!ctx) return;
+                    
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Q1 2023', 'Q2 2023', 'Q3 2023', 'Q4 2023', 'Q1 2024', 'Q2 2024'],
+                            datasets: [{
+                                label: 'Ventas Período Base',
+                                data: [95000, 102000, 98000, 115000, 108000, 98432],
+                                borderColor: '#6366f1',
+                                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                                tension: 0.4
+                            }, {
+                                label: 'Ventas Período Comparación',
+                                data: [null, null, null, null, 112000, 124567],
+                                borderColor: '#0ea5e9',
+                                backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return '$' + value.toLocaleString();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        }
+    </script>
+</body>
+</html>
