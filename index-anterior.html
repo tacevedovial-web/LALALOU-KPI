@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LALALOU - Dashboard KPIs Temporada Invierno 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'lalalou': {
+                            50: '#fef7ff',
+                            100: '#fdf2ff',
+                            200: '#f9e5ff',
+                            300: '#f5d0ff',
+                            400: '#e5a3ff',
+                            500: '#d375ff',
+                            600: '#b955ff',
+                            700: '#9c37ff',
+                            800: '#7c2ae8',
+                            900: '#6622cc',
+                            950: '#44178a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="h-full bg-gray-50">
+    <div x-data="lalalouDashboard()" class="h-full">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-4">
+                    <div class="flex items-center space-x-4">
+                        <h1 class="text-2xl font-bold text-lalalou-800">
+                            <i class="fas fa-chart-line mr-2"></i>
+                            LALALOU
+                        </h1>
+                        <span class="text-sm bg-lalalou-100 text-lalalou-700 px-3 py-1 rounded-full">
+                            Temporada Invierno 2026
+                        </span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm text-gray-600">Datos al 13 Abril 2026</span>
+                        <button class="bg-lalalou-600 text-white px-4 py-2 rounded-lg hover:bg-lalalou-700 transition">
+                            <i class="fas fa-download mr-2"></i>Exportar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- KPI Cards -->
+        <div class="mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Valor Total Stock -->
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-lalalou-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Valor Total Stock</p>
+                            <p class="text-3xl font-bold text-gray-900">$45.2M</p>
+                            <p class="text-sm text-lalalou-600 mt-1">1,647 unidades totales</p>
+                        </div>
+                        <div class="p-3 bg-lalalou-100 rounded-full">
+                            <i class="fas fa-dollar-sign text-lalalou-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stock Invierno 2026 -->
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Stock I26</p>
+                            <p class="text-3xl font-bold text-gray-900">1,213</p>
+                            <p class="text-sm text-green-600 mt-1">74% del inventario</p>
+                        </div>
+                        <div class="p-3 bg-green-100 rounded-full">
+                            <i class="fas fa-snowflake text-green-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ventas 2 Semanas -->
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Ventas 2 Sem</p>
+                            <p class="text-3xl font-bold text-gray-900">186</p>
+                            <p class="text-sm text-blue-600 mt-1">30 Mar - 12 Abr</p>
+                        </div>
+                        <div class="p-3 bg-blue-100 rounded-full">
+                            <i class="fas fa-shopping-cart text-blue-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Productos Críticos -->
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Tallas Críticas</p>
+                            <p class="text-3xl font-bold text-gray-900">127</p>
+                            <p class="text-sm text-red-600 mt-1">≤1 semana stock</p>
+                        </div>
+                        <div class="p-3 bg-red-100 rounded-full">
+                            <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos y Tablas -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Stock por Categoría -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-chart-pie mr-2 text-lalalou-600"></i>
+                        Stock por Categoría
+                    </h3>
+                    <canvas id="stockChart" width="400" height="300"></canvas>
+                </div>
+
+                <!-- Valor de Inventario -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-chart-bar mr-2 text-lalalou-600"></i>
+                        Valor por Categoría (Millones $)
+                    </h3>
+                    <canvas id="valueChart" width="400" height="300"></canvas>
+                </div>
+
+                <!-- Productos Top Críticos -->
+                <div class="bg-white rounded-lg shadow-md p-6 lg:col-span-2">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-list mr-2 text-red-600"></i>
+                        Productos Críticos - Menos de 1 Semana de Stock
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock Actual</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Semanas</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">% Vendido</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">PANTALON BONE COTELE CRUDO</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Pantalones</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">11</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-bold">0.85</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">72.5%</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                            Crítico
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">PANTALON ISABEL COTELE VERDE</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Pantalones</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">31</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-yellow-600 font-bold">12.4</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">13.9%</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            Bueno
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Análisis de Faltantes -->
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 lg:col-span-2">
+                    <h3 class="text-lg font-semibold text-yellow-800 mb-4">
+                        <i class="fas fa-search mr-2"></i>
+                        🔍 Unidades Faltantes - Análisis
+                    </h3>
+                    <div class="bg-white rounded-lg p-4 border border-yellow-200">
+                        <p class="text-gray-700 leading-relaxed">
+                            <strong>Hallazgo:</strong> Algunos productos tienen menos stock del que deberían según la Base de Confección. 
+                            La diferencia no se explica por ventas registradas en Bsale (30 Mar – 12 Abr).
+                        </p>
+                        <p class="text-gray-700 mt-3 leading-relaxed">
+                            <strong>Recomendación:</strong> Confirmar con el equipo si se sacaron muestras, regalos, o traspasos sin registrar.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Zone -->
+            <div class="mt-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-upload mr-2 text-lalalou-600"></i>
+                        Actualizar Datos - Subir Nuevos Archivos Excel
+                    </h3>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-lalalou-400 transition-colors cursor-pointer"
+                         @dragover.prevent @drop.prevent="handleFileDrop($event)">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                        <p class="text-lg font-medium text-gray-700 mb-2">Arrastra archivos Excel aquí</p>
+                        <p class="text-sm text-gray-500">O haz click para seleccionar archivos</p>
+                        <input type="file" multiple accept=".xlsx,.xls" class="hidden" @change="handleFileSelect($event)">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function lalalouDashboard() {
+            return {
+                init() {
+                    this.initCharts();
+                },
+                
+                initCharts() {
+                    // Stock por Categoría (Datos reales LALALOU)
+                    const stockCtx = document.getElementById('stockChart').getContext('2d');
+                    new Chart(stockCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Blazers y Chaquetas', 'Sweaters', 'Pantalones', 'Abrigos', 'Otros'],
+                            datasets: [{
+                                data: [270, 324, 287, 71, 261],
+                                backgroundColor: [
+                                    '#d375ff',
+                                    '#9c37ff',
+                                    '#6622cc',
+                                    '#44178a',
+                                    '#7c2ae8'
+                                ],
+                                borderWidth: 2,
+                                borderColor: '#ffffff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        padding: 20,
+                                        usePointStyle: true
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    // Valor por Categoría (Millones $)
+                    const valueCtx = document.getElementById('valueChart').getContext('2d');
+                    new Chart(valueCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Blazers', 'Sweaters', 'Pantalones', 'Abrigos', 'Otros'],
+                            datasets: [{
+                                label: 'Valor (Millones $)',
+                                data: [15.03, 12.8, 8.5, 11.32, 7.2],
+                                backgroundColor: 'rgba(211, 117, 255, 0.8)',
+                                borderColor: 'rgba(211, 117, 255, 1)',
+                                borderWidth: 2,
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return '$' + value + 'M';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                },
+
+                handleFileDrop(event) {
+                    const files = event.dataTransfer.files;
+                    this.processFiles(files);
+                },
+
+                handleFileSelect(event) {
+                    const files = event.target.files;
+                    this.processFiles(files);
+                },
+
+                processFiles(files) {
+                    console.log('Archivos seleccionados:', files.length);
+                    // Aquí se procesarían los archivos Excel
+                    alert('Funcionalidad de procesamiento Excel en desarrollo');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
