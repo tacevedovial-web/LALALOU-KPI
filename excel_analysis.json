@@ -1,0 +1,999 @@
+{
+  "Analisis_Stock_Lalalou_Domingo_12---a3b5d6b2-e91b-4595-9311-cf9e8205aec6.xlsx": {
+    "sheets": {
+      "Insights": {
+        "rows": 117,
+        "columns": [
+          "🔍 UNIDADES FALTANTES — ¿Se sacaron sin pasar por Bsale?"
+        ],
+        "numericColumns": [],
+        "textColumns": [
+          "🔍 UNIDADES FALTANTES — ¿Se sacaron sin pasar por Bsale?"
+        ],
+        "sampleData": [
+          [
+            "🔍 UNIDADES FALTANTES — ¿Se sacaron sin pasar por Bsale?"
+          ],
+          [
+            "Estos productos tienen menos stock del que deberían según la Base de Confección. La diferencia no se explica por ventas registradas en Bsale (30 Mar – 12 Abr). Confirmar con el equipo si se sacaron muestras, regalos, o traspasos sin registrar."
+          ],
+          []
+        ]
+      },
+      "Semanas Estiamdas Ordenado": {
+        "rows": 1016,
+        "columns": [
+          "Temporada Invierno 2026",
+          "Datos al 13 Abril"
+        ],
+        "numericColumns": [],
+        "textColumns": [
+          "Temporada Invierno 2026",
+          "Datos al 13 Abril"
+        ],
+        "sampleData": [
+          [
+            "Temporada Invierno 2026",
+            "Datos al 13 Abril"
+          ],
+          [],
+          [
+            "Stock y Consumo",
+            "Stock Actual",
+            "Ventas 2 Semanas (30/3-12/4)",
+            "Semanas estimadas de Stock"
+          ]
+        ]
+      },
+      "Ventas por Semana": {
+        "rows": 997,
+        "columns": [],
+        "numericColumns": [],
+        "textColumns": [],
+        "sampleData": [
+          [],
+          [
+            null,
+            "Ventas temporada I26",
+            null,
+            "Semana 1",
+            null,
+            null,
+            "Semana 2",
+            null,
+            null,
+            "Suma Venta Neta dos semanas"
+          ],
+          [
+            null,
+            null,
+            null,
+            "Suma de Cantidad",
+            "Suma de Venta Total Neta",
+            null,
+            "Suma de Cantidad",
+            "Venta neta semana 2"
+          ]
+        ]
+      },
+      "Tabla Stock Actual": {
+        "rows": 15,
+        "columns": [
+          "Categoría",
+          "Stock I26",
+          "Valor Stock I26",
+          "Stock Otras Temp.",
+          "Valor Otras Temp.",
+          "Stock Total",
+          "Valor Total"
+        ],
+        "numericColumns": [
+          "Stock I26",
+          "Valor Stock I26",
+          "Stock Otras Temp.",
+          "Valor Otras Temp.",
+          "Stock Total",
+          "Valor Total"
+        ],
+        "textColumns": [
+          "Categoría"
+        ],
+        "sampleData": [
+          [
+            "Categoría",
+            "Stock I26",
+            "Valor Stock I26",
+            "Stock Otras Temp.",
+            "Valor Otras Temp.",
+            "Stock Total",
+            "Valor Total"
+          ],
+          [
+            "Abrigos",
+            71,
+            11322236,
+            0,
+            0,
+            71,
+            11322236
+          ],
+          [
+            "Blazers y Chaquetas",
+            193,
+            11460491,
+            77,
+            3572898,
+            270,
+            15033389
+          ]
+        ]
+      },
+      "Resumen Productos": {
+        "rows": 82,
+        "columns": [
+          "Categoría",
+          "Producto",
+          "Tallas",
+          "Stock Confeccionado",
+          "Stock Actual",
+          "Ventas 2 Sem (30/3-12/4)",
+          "% Vendido",
+          "Sem. Stock Prom.",
+          "Tallas Agotadas",
+          "Tallas Críticas (≤1 sem)",
+          "Detalle Tallas Agotadas",
+          "Orden Agotamiento Tallas"
+        ],
+        "numericColumns": [
+          "Tallas",
+          "Stock Confeccionado",
+          "Stock Actual",
+          "Ventas 2 Sem (30/3-12/4)",
+          "% Vendido",
+          "Sem. Stock Prom.",
+          "Tallas Agotadas",
+          "Tallas Críticas (≤1 sem)",
+          "Orden Agotamiento Tallas"
+        ],
+        "textColumns": [
+          "Categoría",
+          "Producto",
+          "Detalle Tallas Agotadas"
+        ],
+        "sampleData": [
+          [
+            "Categoría",
+            "Producto",
+            "Tallas",
+            "Stock Confeccionado",
+            "Stock Actual",
+            "Ventas 2 Sem (30/3-12/4)",
+            "% Vendido",
+            "Sem. Stock Prom.",
+            "Tallas Agotadas",
+            "Tallas Críticas (≤1 sem)",
+            "Detalle Tallas Agotadas",
+            "Orden Agotamiento Tallas"
+          ],
+          [
+            "Pantalones",
+            "PANTALON BONE COTELE CRUDO",
+            5,
+            40,
+            11,
+            26,
+            0.725,
+            0.8461538461538461,
+            2,
+            1,
+            "TALLA 36, TALLA 38",
+            "36 (8/4) → 38 (11/4)"
+          ],
+          [
+            "Pantalones",
+            "PANTALON ISABEL COTELE VERDE",
+            5,
+            36,
+            31,
+            5,
+            0.1388888888888889,
+            12.4,
+            0,
+            0,
+            "",
+            ""
+          ]
+        ]
+      },
+      "Resumen Productos con Tallas": {
+        "rows": 299,
+        "columns": [
+          "Categoría",
+          "Producto",
+          "Talla",
+          "SKU",
+          "Stock Total Confeccionado",
+          "Stock Actual (13/04)",
+          "Ventas 2 semanas (30/3-12/4)",
+          "Diferencia Inv.",
+          "Semanas de Stock Restantes",
+          "Observaciones",
+          "Consumo por Fecha"
+        ],
+        "numericColumns": [
+          "Stock Total Confeccionado",
+          "Stock Actual (13/04)",
+          "Ventas 2 semanas (30/3-12/4)",
+          "Diferencia Inv.",
+          "Semanas de Stock Restantes"
+        ],
+        "textColumns": [
+          "Categoría",
+          "Producto",
+          "Talla",
+          "SKU",
+          "Observaciones",
+          "Consumo por Fecha"
+        ],
+        "sampleData": [
+          [
+            "Categoría",
+            "Producto",
+            "Talla",
+            "SKU",
+            "Stock Total Confeccionado",
+            "Stock Actual (13/04)",
+            "Ventas 2 semanas (30/3-12/4)",
+            "Diferencia Inv.",
+            "Semanas de Stock Restantes",
+            "Observaciones",
+            "Consumo por Fecha"
+          ],
+          [
+            "Blazers y Chaquetas",
+            "BLAZER ATELIER TWEED",
+            "TALLA XS",
+            null,
+            8,
+            0,
+            7,
+            -1,
+            0,
+            "🔴 Agotado (vendido todo)",
+            "Agotada 11/4"
+          ],
+          [
+            "Blazers y Chaquetas",
+            "BLAZER ATELIER TWEED",
+            "TALLA S",
+            null,
+            14,
+            0,
+            13,
+            -1,
+            0,
+            "🔴 Agotado (vendido todo)",
+            "Agotada 8/4"
+          ]
+        ]
+      },
+      "Stock 13 abril": {
+        "rows": 613,
+        "columns": [
+          "Sucursal",
+          "Casa Matriz"
+        ],
+        "numericColumns": [],
+        "textColumns": [
+          "Sucursal",
+          "Casa Matriz"
+        ],
+        "sampleData": [
+          [
+            "Sucursal",
+            "Casa Matriz"
+          ],
+          [
+            "Filtros",
+            "Con stock"
+          ],
+          [
+            "",
+            ""
+          ]
+        ]
+      },
+      "Hoja4": {
+        "rows": 370,
+        "columns": [
+          "Tipo Movimiento",
+          "(Varios elementos)"
+        ],
+        "numericColumns": [],
+        "textColumns": [
+          "Tipo Movimiento",
+          "(Varios elementos)"
+        ],
+        "sampleData": [
+          [
+            "Tipo Movimiento",
+            "(Varios elementos)"
+          ],
+          [],
+          [
+            "Etiquetas de fila",
+            "Suma de Cantidad"
+          ]
+        ]
+      },
+      "Hoja5": {
+        "rows": 15,
+        "columns": [
+          "Tipo de Producto / Servicio",
+          "(Varios elementos)"
+        ],
+        "numericColumns": [],
+        "textColumns": [
+          "Tipo de Producto / Servicio",
+          "(Varios elementos)"
+        ],
+        "sampleData": [
+          [
+            "Tipo de Producto / Servicio",
+            "(Varios elementos)"
+          ],
+          [],
+          [
+            "Etiquetas de fila",
+            "Suma de Cantidad"
+          ]
+        ]
+      },
+      "Ventas 30 al 12": {
+        "rows": 984,
+        "columns": [
+          "Tipo Movimiento",
+          "Tipo de Documento",
+          "Numero del documento",
+          "Fecha de Emisión",
+          "Tracking number",
+          "Fecha y Hora Venta",
+          "Sucursal",
+          "Vendedor",
+          "Nombre Cliente",
+          "Cliente RUT",
+          "Email Cliente",
+          "Cliente Dirección",
+          "Cliente Comuna",
+          "Cliente Ciudad",
+          "Lista de Precio",
+          "Tipo de entrega",
+          "Moneda",
+          "Tipo de Producto / Servicio",
+          "SKU",
+          "Producto / Servicio",
+          "Variante",
+          "Otros Atributos",
+          "Marca",
+          "Detalle de Productos/Servicios Pack/Promo",
+          "Precio de Lista",
+          "Precio Neto Unitario",
+          "Precio Bruto Unitario",
+          "Cantidad",
+          "Venta Total Neta",
+          "Total Impuestos",
+          "Venta Total Bruta",
+          "Nombre de dcto",
+          "Descuento Neto",
+          "Descuento Bruto",
+          "% Descuento",
+          "Costo neto unitario",
+          "Costo Total Neto",
+          "Margen",
+          "% Margen",
+          "Atributo Temporada",
+          "Atributo Temporadas",
+          "Atributo talla"
+        ],
+        "numericColumns": [
+          "Numero del documento",
+          "Fecha de Emisión",
+          "Fecha y Hora Venta",
+          "Cliente RUT",
+          "SKU",
+          "Precio de Lista",
+          "Precio Neto Unitario",
+          "Precio Bruto Unitario",
+          "Cantidad",
+          "Venta Total Neta",
+          "Total Impuestos",
+          "Venta Total Bruta",
+          "Descuento Neto",
+          "Descuento Bruto",
+          "% Descuento",
+          "Costo neto unitario",
+          "Costo Total Neto",
+          "Margen",
+          "% Margen"
+        ],
+        "textColumns": [
+          "Tipo Movimiento",
+          "Tipo de Documento",
+          "Tracking number",
+          "Sucursal",
+          "Vendedor",
+          "Nombre Cliente",
+          "Email Cliente",
+          "Cliente Dirección",
+          "Cliente Comuna",
+          "Cliente Ciudad",
+          "Lista de Precio",
+          "Tipo de entrega",
+          "Moneda",
+          "Tipo de Producto / Servicio",
+          "Producto / Servicio",
+          "Variante",
+          "Otros Atributos",
+          "Marca",
+          "Detalle de Productos/Servicios Pack/Promo",
+          "Nombre de dcto",
+          "Atributo Temporada",
+          "Atributo Temporadas",
+          "Atributo talla"
+        ],
+        "sampleData": [
+          [
+            "Tipo Movimiento",
+            "Tipo de Documento",
+            "Numero del documento",
+            "Fecha de Emisión",
+            "Tracking number",
+            "Fecha y Hora Venta",
+            "Sucursal",
+            "Vendedor",
+            "Nombre Cliente",
+            "Cliente RUT",
+            "Email Cliente",
+            "Cliente Dirección",
+            "Cliente Comuna",
+            "Cliente Ciudad",
+            "Lista de Precio",
+            "Tipo de entrega",
+            "Moneda",
+            "Tipo de Producto / Servicio",
+            "SKU",
+            "Producto / Servicio",
+            "Variante",
+            "Otros Atributos",
+            "Marca",
+            "Detalle de Productos/Servicios Pack/Promo",
+            "Precio de Lista",
+            "Precio Neto Unitario",
+            "Precio Bruto Unitario",
+            "Cantidad",
+            "Venta Total Neta",
+            "Total Impuestos",
+            "Venta Total Bruta",
+            "Nombre de dcto",
+            "Descuento Neto",
+            "Descuento Bruto",
+            "% Descuento",
+            "Costo neto unitario",
+            "Costo Total Neto",
+            "Margen",
+            "% Margen",
+            "Atributo Temporada",
+            "Atributo Temporadas",
+            "Atributo talla"
+          ],
+          [
+            "devolucion",
+            "NOTA DE CRÉDITO ELECTRÓNICA T",
+            "4125",
+            "30/03/2026",
+            "",
+            "27/03/2026 10:32:10",
+            "Casa Matriz",
+            "Olivia Pacheco",
+            "macarena perez",
+            "7.017.208-9",
+            "",
+            "espoz 3049",
+            "vitacura",
+            "santiago",
+            "Lista de Precios Base",
+            "",
+            "CLP",
+            "Pantalones",
+            "77383340853095",
+            "PANTALON LALALOU LANA NEGRA",
+            "TALLA 40",
+            "",
+            "LANA NEGRA",
+            "",
+            179990,
+            -122514,
+            145792,
+            -1,
+            -122514,
+            -23278,
+            -145792,
+            "descuento manual",
+            -28738,
+            -34198,
+            0.19,
+            -43264,
+            -43264,
+            -79250,
+            0.65,
+            "Invierno 26",
+            "Invierno 26",
+            ""
+          ],
+          [
+            "devolucion",
+            "NOTA DE CRÉDITO ELECTRÓNICA T",
+            "4125",
+            "30/03/2026",
+            "",
+            "27/03/2026 10:32:10",
+            "Casa Matriz",
+            "Olivia Pacheco",
+            "macarena perez",
+            "7.017.208-9",
+            "",
+            "espoz 3049",
+            "vitacura",
+            "santiago",
+            "Lista de Precios Base",
+            "",
+            "CLP",
+            "Pantalones",
+            "77383340856069",
+            "PANTALON LAPIZ LANA NEGRA",
+            "TALLA 40",
+            "",
+            "LANA NEGRA",
+            "",
+            189990,
+            -129321,
+            153892,
+            -1,
+            -129321,
+            -24571,
+            -153892,
+            "descuento manual",
+            -30334,
+            -36098,
+            0.19,
+            -38149,
+            -38149,
+            -91172,
+            0.71,
+            "Invierno 26",
+            "Invierno 26",
+            ""
+          ]
+        ]
+      },
+      "Base de Productos Temp 2026": {
+        "rows": 299,
+        "columns": [
+          "Clasificación",
+          "Tipo de producto o servicio",
+          "Nombre Producto/Servicio",
+          "Variante",
+          "Marca",
+          "Permite Decimal",
+          "Código Barras",
+          "SKU",
+          "Controla Stock",
+          "Stock",
+          "Costo Neto",
+          "Precio Unitario",
+          "Nombre impuestos",
+          "Manejar serie de producto",
+          "Serie por lotes",
+          "talla",
+          "Temporada",
+          "Temporadas"
+        ],
+        "numericColumns": [
+          "Stock",
+          "Costo Neto",
+          "Precio Unitario"
+        ],
+        "textColumns": [
+          "Clasificación",
+          "Tipo de producto o servicio",
+          "Nombre Producto/Servicio",
+          "Variante",
+          "Marca",
+          "Permite Decimal",
+          "Código Barras",
+          "SKU",
+          "Controla Stock",
+          "Nombre impuestos",
+          "Manejar serie de producto",
+          "Serie por lotes",
+          "talla",
+          "Temporada",
+          "Temporadas"
+        ],
+        "sampleData": [
+          [
+            "Clasificación",
+            "Tipo de producto o servicio",
+            "Nombre Producto/Servicio",
+            "Variante",
+            "Marca",
+            "Permite Decimal",
+            "Código Barras",
+            "SKU",
+            "Controla Stock",
+            "Stock",
+            "Costo Neto",
+            "Precio Unitario",
+            "Nombre impuestos",
+            "Manejar serie de producto",
+            "Serie por lotes",
+            "talla",
+            "Temporada",
+            "Temporadas"
+          ],
+          [
+            "Producto",
+            "Pantalones",
+            "PANTALON BONE COTELE CRUDO",
+            "TALLA 32",
+            "COTELE CRUDO",
+            "No",
+            null,
+            null,
+            "Sí",
+            14,
+            21760,
+            84025.21008403362,
+            "IVA",
+            "No",
+            "No",
+            null,
+            "Invierno 26",
+            "Invierno 26"
+          ],
+          [
+            "Producto",
+            "Pantalones",
+            "PANTALON BONE COTELE CRUDO",
+            "TALLA 34",
+            "COTELE CRUDO",
+            "No",
+            null,
+            null,
+            "Sí",
+            14,
+            21760,
+            84025.21008403362,
+            "IVA",
+            "No",
+            "No",
+            null,
+            "Invierno 26",
+            "Invierno 26"
+          ]
+        ]
+      },
+      "Análisis Velocidad Tallas": {
+        "rows": 262,
+        "columns": [
+          "🏃 VELOCIDAD DE VENTA POR TALLA — ¿Qué tallas producir primero?",
+          null,
+          null,
+          null,
+          null,
+          "",
+          ""
+        ],
+        "numericColumns": [],
+        "textColumns": [
+          "🏃 VELOCIDAD DE VENTA POR TALLA — ¿Qué tallas producir primero?",
+          "",
+          ""
+        ],
+        "sampleData": [
+          [
+            "🏃 VELOCIDAD DE VENTA POR TALLA — ¿Qué tallas producir primero?",
+            null,
+            null,
+            null,
+            null,
+            "",
+            ""
+          ],
+          [
+            "Las tallas que se agotaron más rápido indican mayor demanda. Priorizar producción de las marcadas 🔴 y 🟠.",
+            null,
+            null,
+            null,
+            null,
+            "",
+            ""
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            "",
+            ""
+          ]
+        ]
+      }
+    },
+    "summary": {}
+  },
+  "Detalle_de_ventas_con_atributos_-_30_03_2026_-_12_04_2026---88fb4a61-00b6-4789-b1c5-f013503112df.xlsx": {
+    "sheets": {
+      "Sheet1": {
+        "rows": 985,
+        "columns": [
+          "Tipo Movimiento",
+          "Tipo de Documento",
+          "Numero del documento",
+          "Fecha de Emisión",
+          "Tracking number",
+          "Fecha y Hora Venta",
+          "Sucursal",
+          "Vendedor",
+          "Nombre Cliente",
+          "Cliente RUT",
+          "Email Cliente",
+          "Cliente Dirección",
+          "Cliente Comuna",
+          "Cliente Ciudad",
+          "Lista de Precio",
+          "Tipo de entrega",
+          "Moneda",
+          "Tipo de Producto / Servicio",
+          "SKU",
+          "Producto / Servicio",
+          "Variante",
+          "Otros Atributos",
+          "Marca",
+          "Detalle de Productos/Servicios Pack/Promo",
+          "Precio de Lista",
+          "Precio Neto Unitario",
+          "Precio Bruto Unitario",
+          "Cantidad",
+          "Venta Total Neta",
+          "Total Impuestos",
+          "Venta Total Bruta",
+          "Nombre de dcto",
+          "Descuento Neto",
+          "Descuento Bruto",
+          "% Descuento",
+          "Costo neto unitario",
+          "Costo Total Neto",
+          "Margen",
+          "% Margen",
+          "Atributo Temporada",
+          "Atributo Temporadas",
+          "Atributo talla"
+        ],
+        "numericColumns": [
+          "Numero del documento",
+          "Fecha de Emisión",
+          "Fecha y Hora Venta",
+          "Cliente RUT",
+          "SKU",
+          "Precio de Lista",
+          "Precio Neto Unitario",
+          "Precio Bruto Unitario",
+          "Cantidad",
+          "Venta Total Neta",
+          "Total Impuestos",
+          "Venta Total Bruta",
+          "Descuento Neto",
+          "Descuento Bruto",
+          "% Descuento",
+          "Costo neto unitario",
+          "Costo Total Neto",
+          "Margen",
+          "% Margen"
+        ],
+        "textColumns": [
+          "Tipo Movimiento",
+          "Tipo de Documento",
+          "Tracking number",
+          "Sucursal",
+          "Vendedor",
+          "Nombre Cliente",
+          "Email Cliente",
+          "Cliente Dirección",
+          "Cliente Comuna",
+          "Cliente Ciudad",
+          "Lista de Precio",
+          "Tipo de entrega",
+          "Moneda",
+          "Tipo de Producto / Servicio",
+          "Producto / Servicio",
+          "Variante",
+          "Otros Atributos",
+          "Marca",
+          "Detalle de Productos/Servicios Pack/Promo",
+          "Nombre de dcto",
+          "Atributo Temporada",
+          "Atributo Temporadas",
+          "Atributo talla"
+        ],
+        "sampleData": [
+          [
+            "Tipo Movimiento",
+            "Tipo de Documento",
+            "Numero del documento",
+            "Fecha de Emisión",
+            "Tracking number",
+            "Fecha y Hora Venta",
+            "Sucursal",
+            "Vendedor",
+            "Nombre Cliente",
+            "Cliente RUT",
+            "Email Cliente",
+            "Cliente Dirección",
+            "Cliente Comuna",
+            "Cliente Ciudad",
+            "Lista de Precio",
+            "Tipo de entrega",
+            "Moneda",
+            "Tipo de Producto / Servicio",
+            "SKU",
+            "Producto / Servicio",
+            "Variante",
+            "Otros Atributos",
+            "Marca",
+            "Detalle de Productos/Servicios Pack/Promo",
+            "Precio de Lista",
+            "Precio Neto Unitario",
+            "Precio Bruto Unitario",
+            "Cantidad",
+            "Venta Total Neta",
+            "Total Impuestos",
+            "Venta Total Bruta",
+            "Nombre de dcto",
+            "Descuento Neto",
+            "Descuento Bruto",
+            "% Descuento",
+            "Costo neto unitario",
+            "Costo Total Neto",
+            "Margen",
+            "% Margen",
+            "Atributo Temporada",
+            "Atributo Temporadas",
+            "Atributo talla"
+          ],
+          [
+            "devolucion",
+            "NOTA DE CRÉDITO ELECTRÓNICA T",
+            "4125",
+            "30/03/2026",
+            "",
+            "27/03/2026 10:32:10",
+            "Casa Matriz",
+            "Olivia Pacheco",
+            "macarena perez",
+            "7.017.208-9",
+            "",
+            "espoz 3049",
+            "vitacura",
+            "santiago",
+            "Lista de Precios Base",
+            "",
+            "CLP",
+            "Pantalones",
+            "77383340853095",
+            "PANTALON LALALOU LANA NEGRA",
+            "TALLA 40",
+            "",
+            "LANA NEGRA",
+            "",
+            179990,
+            -122514,
+            145792,
+            -1,
+            -122514,
+            -23278,
+            -145792,
+            "descuento manual",
+            -28738,
+            -34198,
+            0.19,
+            -43264,
+            -43264,
+            -79250,
+            0.65,
+            "Invierno 26",
+            "Invierno 26",
+            ""
+          ],
+          [
+            "devolucion",
+            "NOTA DE CRÉDITO ELECTRÓNICA T",
+            "4125",
+            "30/03/2026",
+            "",
+            "27/03/2026 10:32:10",
+            "Casa Matriz",
+            "Olivia Pacheco",
+            "macarena perez",
+            "7.017.208-9",
+            "",
+            "espoz 3049",
+            "vitacura",
+            "santiago",
+            "Lista de Precios Base",
+            "",
+            "CLP",
+            "Pantalones",
+            "77383340856069",
+            "PANTALON LAPIZ LANA NEGRA",
+            "TALLA 40",
+            "",
+            "LANA NEGRA",
+            "",
+            189990,
+            -129321,
+            153892,
+            -1,
+            -129321,
+            -24571,
+            -153892,
+            "descuento manual",
+            -30334,
+            -36098,
+            0.19,
+            -38149,
+            -38149,
+            -91172,
+            0.71,
+            "Invierno 26",
+            "Invierno 26",
+            ""
+          ]
+        ]
+      }
+    },
+    "summary": {}
+  },
+  "Stock-actual_Casa-Matriz_13-04-2026---ae384ec1-f9c0-400f-bb9a-d94845d2d71b.xlsx": {
+    "sheets": {
+      "Sheet1": {
+        "rows": 585,
+        "columns": [
+          "Sucursal",
+          "Casa Matriz"
+        ],
+        "numericColumns": [],
+        "textColumns": [
+          "Sucursal",
+          "Casa Matriz"
+        ],
+        "sampleData": [
+          [
+            "Sucursal",
+            "Casa Matriz"
+          ],
+          [
+            "Filtros",
+            "Con stock"
+          ],
+          [
+            "",
+            ""
+          ]
+        ]
+      }
+    },
+    "summary": {}
+  }
+}
