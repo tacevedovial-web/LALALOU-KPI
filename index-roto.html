@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard LALALOU - AV Capital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'av-blue-light': '#0ea5e9',
+                        'av-blue': '#3b82f6',
+                        'av-blue-dark': '#1e40af'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-av-blue rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-xl">AV</span>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Dashboard LALALOU</h1>
+                        <p class="text-gray-600">Panel de Control - AV Capital</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm text-gray-500">Última actualización</p>
+                    <p id="lastUpdate" class="text-sm font-medium text-av-blue">Cargando...</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div class="text-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-av-blue mx-auto mb-4"></div>
+            <p class="text-lg font-medium text-gray-900">Cargando datos LALALOU...</p>
+            <p class="text-gray-600">Procesando Excel y generando KPIs</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main id="mainContent" class="max-w-7xl mx-auto px-4 py-8 hidden">
+        <!-- Upload Section -->
+        <section class="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Actualizar Datos</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-av-blue transition-colors">
+                    <input type="file" id="stockFile" accept=".xlsx,.xls" class="hidden" onchange="handleFileUpload('stock', this)">
+                    <label for="stockFile" class="cursor-pointer">
+                        <div class="mb-2">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <p class="text-sm font-medium text-gray-900">Archivo de Stock</p>
+                        <p class="text-xs text-gray-500">Subir Excel de stock actual</p>
+                    </label>
+                </div>
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-av-blue transition-colors">
+                    <input type="file" id="ventasFile" accept=".xlsx,.xls" class="hidden" onchange="handleFileUpload('ventas', this)">
+                    <label for="ventasFile" class="cursor-pointer">
+                        <div class="mb-2">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                <path d="M9 17a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0116.07 12h15.86a2 2 0 011.664.89l.812 1.22A2 2 0 0036.07 15H37a2 2 0 012 2v16a2 2 0 01-2 2H11a2 2 0 01-2-2V17z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M24 23a4 4 0 100 8 4 4 0 000-8z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <p class="text-sm font-medium text-gray-900">Archivo de Ventas</p>
+                        <p class="text-xs text-gray-500">Subir Excel de ventas detalladas</p>
+                    </label>
+                </div>
+            </div>
+            <div class="mt-4 text-center">
+                <button onclick="refreshData()" class="bg-av-blue hover:bg-av-blue-dark text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                    🔄 Actualizar Dashboard
+                </button>
+            </div>
+        </section>
+
+        <!-- KPI Cards -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-2 bg-av-blue-light bg-opacity-20 rounded-lg">
+                        <svg class="w-6 h-6 text-av-blue-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Stock Total</p>
+                        <p id="totalStock" class="text-2xl font-bold text-gray-900">-</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-2 bg-av-blue bg-opacity-20 rounded-lg">
+                        <svg class="w-6 h-6 text-av-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Ventas Totales</p>
+                        <p id="totalVentas" class="text-2xl font-bold text-gray-900">-</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-2 bg-av-blue-dark bg-opacity-20 rounded-lg">
+                        <svg class="w-6 h-6 text-av-blue-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Categorías</p>
+                        <p id="totalCategorias" class="text-2xl font-bold text-gray-900">-</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-2 bg-red-500 bg-opacity-20 rounded-lg">
+                        <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Stock Crítico</p>
+                        <p id="stockCritico" class="text-2xl font-bold text-gray-900">-</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Stock por Categoría -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Stock por Categoría</h3>
+                <div class="h-64">
+                    <canvas id="stockChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Productos -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Top Productos Vendidos</h3>
+                <div class="h-64">
+                    <canvas id="productosChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tables Section -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Top Productos Table -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Productos Más Vendidos</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Producto</th>
+                                <th class="text-right py-2 px-3 text-xs font-medium text-gray-500 uppercase">Ventas</th>
+                                <th class="text-right py-2 px-3 text-xs font-medium text-gray-500 uppercase">Unidades</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topProductosTable" class="divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Stock Crítico -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Categorías con Stock Crítico</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Categoría</th>
+                                <th class="text-right py-2 px-3 text-xs font-medium text-gray-500 uppercase">Stock</th>
+                                <th class="text-right py-2 px-3 text-xs font-medium text-gray-500 uppercase">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stockCriticoTable" class="divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let currentData = null;
+        let stockChart = null;
+        let productosChart = null;
+
+        // Cargar datos iniciales
+        async function loadInitialData() {
+            try {
+                const response = await fetch('./data.json');
+                if (response.ok) {
+                    currentData = await response.json();
+                    updateDashboard(currentData);
+                } else {
+                    console.log('No se encontró data.json, usando datos por defecto');
+                    showEmptyState();
+                }
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+                showEmptyState();
+            } finally {
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+            }
+        }
+
+        function showEmptyState() {
+            document.getElementById('totalStock').textContent = '0';
+            document.getElementById('totalVentas').textContent = '$0';
+            document.getElementById('totalCategorias').textContent = '0';
+            document.getElementById('stockCritico').textContent = '0';
+            document.getElementById('lastUpdate').textContent = 'Sin datos';
+        }
+
+        function updateDashboard(data) {
+            // Actualizar KPIs
+            document.getElementById('totalStock').textContent = data.resumen.totalProductosStock.toLocaleString();
+            document.getElementById('totalVentas').textContent = `$${parseInt(data.resumen.totalVentasBrutas).toLocaleString()}`;
+            document.getElementById('totalCategorias').textContent = data.resumen.totalCategorias;
+            document.getElementById('stockCritico').textContent = data.stockCritico.length;
+            document.getElementById('lastUpdate').textContent = data.resumen.fechaUltimaActualizacion;
+
+            // Actualizar gráficos
+            updateStockChart(data.stockPorCategoria);
+            updateProductosChart(data.topProductos);
+
+            // Actualizar tablas
+            updateTopProductosTable(data.topProductos);
+            updateStockCriticoTable(data.stockCritico);
+        }
+
+        function updateStockChart(stockData) {
+            const ctx = document.getElementById('stockChart').getContext('2d');
+            
+            if (stockChart) {
+                stockChart.destroy();
+            }
+
+            const sortedData = Object.entries(stockData)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+
+            stockChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedData.map(([categoria]) => categoria.length > 15 ? categoria.substring(0, 15) + '...' : categoria),
+                    datasets: [{
+                        label: 'Productos en Stock',
+                        data: sortedData.map(([, cantidad]) => cantidad),
+                        backgroundColor: '#3b82f6',
+                        borderColor: '#1e40af',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateProductosChart(topProductos) {
+            const ctx = document.getElementById('productosChart').getContext('2d');
+            
+            if (productosChart) {
+                productosChart.destroy();
+            }
+
+            const top5 = topProductos.slice(0, 5);
+
+            productosChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: top5.map(p => p.producto.length > 20 ? p.producto.substring(0, 20) + '...' : p.producto),
+                    datasets: [{
+                        data: top5.map(p => p.ventas),
+                        backgroundColor: [
+                            '#0ea5e9',
+                            '#3b82f6',
+                            '#1e40af',
+                            '#06b6d4',
+                            '#0891b2'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateTopProductosTable(topProductos) {
+            const tbody = document.getElementById('topProductosTable');
+            tbody.innerHTML = '';
+
+            topProductos.slice(0, 10).forEach((producto, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="py-2 px-3 text-sm text-gray-900">
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-av-blue bg-opacity-10 text-av-blue mr-2">
+                            ${index + 1}
+                        </span>
+                        ${producto.producto.length > 30 ? producto.producto.substring(0, 30) + '...' : producto.producto}
+                    </td>
+                    <td class="py-2 px-3 text-sm font-medium text-gray-900 text-right">
+                        $${parseInt(producto.ventas).toLocaleString()}
+                    </td>
+                    <td class="py-2 px-3 text-sm text-gray-500 text-right">${producto.cantidad}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateStockCriticoTable(stockCritico) {
+            const tbody = document.getElementById('stockCriticoTable');
+            tbody.innerHTML = '';
+
+            if (stockCritico.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td colspan="3" class="py-8 px-3 text-center text-gray-500">
+                        <div class="flex flex-col items-center">
+                            <svg class="w-12 h-12 text-green-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <p class="font-medium">¡Excelente!</p>
+                            <p>No hay categorías con stock crítico</p>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+                return;
+            }
+
+            stockCritico.forEach(categoria => {
+                const row = document.createElement('tr');
+                const estado = categoria.cantidad === 0 ? 'Sin Stock' : 'Crítico';
+                const estadoClass = categoria.cantidad === 0 ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800';
+                
+                row.innerHTML = `
+                    <td class="py-2 px-3 text-sm text-gray-900">${categoria.categoria}</td>
+                    <td class="py-2 px-3 text-sm text-gray-900 text-right font-medium">${categoria.cantidad}</td>
+                    <td class="py-2 px-3 text-right">
+                        <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full ${estadoClass}">
+                            ${estado}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Manejar subida de archivos
+        function handleFileUpload(type, input) {
+            const file = input.files[0];
+            if (file) {
+                console.log(`Archivo ${type} subido:`, file.name);
+                // Aquí podrías implementar la carga de archivos al servidor
+                showNotification(`Archivo ${type} cargado: ${file.name}`, 'success');
+            }
+        }
+
+        // Refrescar datos
+        function refreshData() {
+            showNotification('Actualizando dashboard...', 'info');
+            loadInitialData();
+        }
+
+        // Mostrar notificaciones
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-av-blue'
+            };
+            
+            notification.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.classList.remove('translate-x-full'), 100);
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Inicializar dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadInitialData();
+        });
+    </script>
+</body>
+</html>
