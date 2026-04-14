@@ -1,0 +1,176 @@
+{
+  "resumen": {
+    "totalProductosStock": 577,
+    "totalCategorias": 28,
+    "totalVentasBrutas": "141713151",
+    "totalCantidadVendida": 907,
+    "promedioMargen": "92145",
+    "fechaUltimaActualizacion": "14-04-2026, 12:18:16 p. m."
+  },
+  "stockPorCategoria": {
+    "CHAQUETA": 24,
+    "Abrigos": 17,
+    "Sweaters y Chalecos": 33,
+    "chaleco": 2,
+    "short": 8,
+    "Blazers y Chaquetas": 33,
+    "BLAZER Y CHAQUETA": 4,
+    "BLUSAS Y CAMISAS": 49,
+    "BLUSAS Y TOP": 11,
+    "blusa": 36,
+    "BUFANDAS": 9,
+    "camisa": 1,
+    "DENIM": 52,
+    "polera": 31,
+    "TARJETA DE REGALO": 5,
+    "GILET": 13,
+    "Gilets": 13,
+    "pantalon": 53,
+    "Pantalones": 49,
+    "PANTALON YSHORT": 14,
+    "PANTALON Y SHORT": 10,
+    "polera ": 2,
+    "POLERAS": 39,
+    "pollera ": 19,
+    "Polleras": 12,
+    "VESTIDOS Y POLLERAS": 13,
+    "chalecos": 3,
+    "vestido": 22
+  },
+  "stockCritico": [
+    {
+      "categoria": "chaleco",
+      "cantidad": 2
+    },
+    {
+      "categoria": "camisa",
+      "cantidad": 1
+    },
+    {
+      "categoria": "polera ",
+      "cantidad": 2
+    }
+  ],
+  "topProductos": [
+    {
+      "producto": "BLAZER ATELIER TWEED",
+      "ventas": 8381140,
+      "cantidad": 32
+    },
+    {
+      "producto": "CHAQUETA BOMBER TWEED CAFÉ",
+      "ventas": 7357206,
+      "cantidad": 30
+    },
+    {
+      "producto": "CHAQUETA BOMBER ESCOCES",
+      "ventas": 7107216,
+      "cantidad": 29
+    },
+    {
+      "producto": "BLAZER MARGAUX TWEED HERRIBONE",
+      "ventas": 4654814,
+      "cantidad": 19
+    },
+    {
+      "producto": "BLAZER BAR LANA AZUL RAYADA",
+      "ventas": 4588598,
+      "cantidad": 15
+    },
+    {
+      "producto": "PANTALON LALALOU GABARDINA NEGRA",
+      "ventas": 4182968,
+      "cantidad": 24
+    },
+    {
+      "producto": "PANTALON LALALOU GABARDINA CAFÉ",
+      "ventas": 3668196,
+      "cantidad": 21
+    },
+    {
+      "producto": "PANTALON PARMA LANA CUADROS",
+      "ventas": 3410321,
+      "cantidad": 18
+    },
+    {
+      "producto": "CAMISA LALALOU POPELINA CAFÉ",
+      "ventas": 3093762,
+      "cantidad": 25
+    },
+    {
+      "producto": "BLAZER OVERSIZE LANA CUADROS CAFÉ",
+      "ventas": 3079890,
+      "cantidad": 11
+    }
+  ],
+  "topVendedores": [
+    {
+      "vendedor": "Olivia Pacheco",
+      "ventas": 110529210,
+      "cantidad": 651
+    },
+    {
+      "vendedor": "Lalalou LPC",
+      "ventas": 31183941,
+      "cantidad": 256
+    }
+  ],
+  "ventasPorDia": {
+    "30/03/2026": {
+      "total": 29073945,
+      "cantidad": 167
+    },
+    "31/03/2026": {
+      "total": 24585670,
+      "cantidad": 149
+    },
+    "01/04/2026": {
+      "total": 11317700,
+      "cantidad": 72
+    },
+    "02/04/2026": {
+      "total": 6623022,
+      "cantidad": 44
+    },
+    "03/04/2026": {
+      "total": 2849670,
+      "cantidad": 15
+    },
+    "04/04/2026": {
+      "total": 887950,
+      "cantidad": 5
+    },
+    "05/04/2026": {
+      "total": 1737050,
+      "cantidad": 17
+    },
+    "06/04/2026": {
+      "total": 12227650,
+      "cantidad": 73
+    },
+    "07/04/2026": {
+      "total": 6212530,
+      "cantidad": 50
+    },
+    "08/04/2026": {
+      "total": 10241368,
+      "cantidad": 67
+    },
+    "09/04/2026": {
+      "total": 7689569,
+      "cantidad": 59
+    },
+    "10/04/2026": {
+      "total": 15201893,
+      "cantidad": 107
+    },
+    "11/04/2026": {
+      "total": 11930434,
+      "cantidad": 72
+    },
+    "12/04/2026": {
+      "total": 1134700,
+      "cantidad": 10
+    }
+  }
+}
