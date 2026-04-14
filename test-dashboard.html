@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Dashboard LALALOU</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <h1>Test de Funcionalidad Dashboard LALALOU</h1>
+    
+    <h2>1. Test de Carga de Archivos Excel</h2>
+    <input type="file" id="fileInput" accept=".xlsx,.xls" />
+    <div id="fileResult"></div>
+    
+    <h2>2. Test de Procesamiento XLSX</h2>
+    <button onclick="testXLSX()">Probar XLSX.js</button>
+    <div id="xlsxResult"></div>
+    
+    <h2>3. Test de Toast Notifications</h2>
+    <button onclick="testToast()">Mostrar Toast</button>
+    <div id="toastContainer" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+    
+    <script>
+        // Test file upload
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('fileResult').innerHTML = `
+                    ✅ Archivo seleccionado: ${file.name}<br>
+                    Tamaño: ${(file.size / 1024).toFixed(2)} KB<br>
+                    Tipo: ${file.type}
+                `;
+                
+                // Test XLSX reading
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, {type: 'array'});
+                        
+                        document.getElementById('fileResult').innerHTML += `<br>
+                            ✅ Archivo Excel procesado correctamente<br>
+                            Hojas encontradas: ${workbook.SheetNames.join(', ')}<br>
+                            Total de hojas: ${workbook.SheetNames.length}
+                        `;
+                    } catch (error) {
+                        document.getElementById('fileResult').innerHTML += `<br>
+                            ❌ Error procesando Excel: ${error.message}
+                        `;
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        });
+        
+        // Test XLSX library
+        function testXLSX() {
+            try {
+                if (typeof XLSX !== 'undefined') {
+                    document.getElementById('xlsxResult').innerHTML = '✅ XLSX.js cargado correctamente. Version: ' + XLSX.version;
+                    
+                    // Create test data
+                    const ws = XLSX.utils.json_to_sheet([
+                        {Categoria: "Test", Stock: 100, Valor: 50000}
+                    ]);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "Test");
+                    
+                    document.getElementById('xlsxResult').innerHTML += '<br>✅ Puede crear y manipular archivos Excel';
+                } else {
+                    document.getElementById('xlsxResult').innerHTML = '❌ XLSX.js no está cargado';
+                }
+            } catch (error) {
+                document.getElementById('xlsxResult').innerHTML = '❌ Error: ' + error.message;
+            }
+        }
+        
+        // Test toast notifications
+        function testToast() {
+            showToast('success', '¡Éxito!', 'Las notificaciones funcionan correctamente');
+            setTimeout(() => {
+                showToast('error', 'Error', 'Ejemplo de notificación de error');
+            }, 1000);
+            setTimeout(() => {
+                showToast('warning', 'Advertencia', 'Ejemplo de notificación de advertencia');
+            }, 2000);
+        }
+        
+        function showToast(type, title, message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+                padding: 16px;
+                margin-bottom: 10px;
+                min-width: 300px;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            const borderColors = {
+                success: '#10b981',
+                error: '#ef4444',
+                warning: '#f59e0b'
+            };
+            
+            toast.style.borderLeft = `4px solid ${borderColors[type] || '#6b7280'}`;
+            
+            toast.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 4px;">${title}</div>
+                <div style="color: #6b7280;">${message}</div>
+            `;
+            
+            document.getElementById('toastContainer').appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+        
+        // Add animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

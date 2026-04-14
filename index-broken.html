@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LALALOU - Dashboard KPIs Temporada Invierno 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'lalalou': {
+                            50: '#fef7ff',
+                            100: '#fdf2ff',
+                            200: '#f9e5ff',
+                            300: '#f5d0ff',
+                            400: '#e5a3ff',
+                            500: '#d375ff',
+                            600: '#b955ff',
+                            700: '#9c37ff',
+                            800: '#7c2ae8',
+                            900: '#6622cc',
+                            950: '#44178a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="h-full bg-gray-50">
+    <div x-data="lalalouDashboard()" class="h-full">
+        <!-- Sidebar -->
+        <div class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out"
+             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
+            
+            <!-- Logo -->
+            <div class="flex items-center justify-between h-16 px-6 bg-lalalou-600">
+                <h1 class="text-xl font-bold text-white">
+                    <i class="fas fa-store mr-2"></i>LALALOU
+                </h1>
+                <button @click="sidebarOpen = false" class="text-white lg:hidden">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="mt-8">
+                <div class="px-6">
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Dashboard</p>
+                </div>
+                <div class="mt-4 space-y-1">
+                    <a @click="currentView = 'dashboard'" 
+                       class="flex items-center px-6 py-3 text-sm font-medium cursor-pointer transition-colors"
+                       :class="currentView === 'dashboard' ? 'bg-lalalou-50 text-lalalou-700 border-r-4 border-lalalou-600' : 'text-gray-600 hover:bg-gray-50'">
+                        <i class="fas fa-chart-pie mr-3"></i>KPIs Principales
+                    </a>
+                    <a @click="currentView = 'products'" 
+                       class="flex items-center px-6 py-3 text-sm font-medium cursor-pointer transition-colors"
+                       :class="currentView === 'products' ? 'bg-lalalou-50 text-lalalou-700 border-r-4 border-lalalou-600' : 'text-gray-600 hover:bg-gray-50'">
+                        <i class="fas fa-tshirt mr-3"></i>Análisis Productos
+                    </a>
+                    <a @click="currentView = 'stock'" 
+                       class="flex items-center px-6 py-3 text-sm font-medium cursor-pointer transition-colors"
+                       :class="currentView === 'stock' ? 'bg-lalalou-50 text-lalalou-700 border-r-4 border-lalalou-600' : 'text-gray-600 hover:bg-gray-50'">
+                        <i class="fas fa-boxes mr-3"></i>Control Stock
+                    </a>
+                    <a @click="currentView = 'upload'" 
+                       class="flex items-center px-6 py-3 text-sm font-medium cursor-pointer transition-colors"
+                       :class="currentView === 'upload' ? 'bg-lalalou-50 text-lalalou-700 border-r-4 border-lalalou-600' : 'text-gray-600 hover:bg-gray-50'">
+                        <i class="fas fa-upload mr-3"></i>Subir Archivos
+                    </a>
+                </div>
+
+                <div class="px-6 mt-8">
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Temporada</p>
+                </div>
+                <div class="mt-4 px-6">
+                    <div class="bg-lalalou-50 rounded-lg p-4">
+                        <p class="text-sm font-medium text-lalalou-800">Invierno 2026</p>
+                        <p class="text-xs text-lalalou-600 mt-1">Actualizado: <span x-text="lastUpdate"></span></p>
+                        <div class="mt-3">
+                            <div class="flex justify-between text-xs text-lalalou-600 mb-1">
+                                <span>Progreso</span>
+                                <span>74%</span>
+                            </div>
+                            <div class="w-full bg-lalalou-200 rounded-full h-1.5">
+                                <div class="bg-lalalou-600 h-1.5 rounded-full" style="width: 74%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="lg:ml-64">
+            <!-- Top Header -->
+            <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+                <div class="px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between items-center py-4">
+                        <div class="flex items-center space-x-4">
+                            <button @click="sidebarOpen = !sidebarOpen" class="text-gray-600 lg:hidden">
+                                <i class="fas fa-bars"></i>
+                            </button>
+                            <h2 class="text-xl font-semibold text-gray-800" x-text="getViewTitle()"></h2>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <span class="text-sm text-gray-600">Datos al 13 Abril 2026</span>
+                            <button @click="exportData()" class="bg-lalalou-600 text-white px-4 py-2 rounded-lg hover:bg-lalalou-700 transition">
+                                <i class="fas fa-download mr-2"></i>Exportar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Dashboard View -->
+                <div x-show="currentView === 'dashboard'" x-transition>
+                    <!-- KPI Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <template x-for="kpi in kpiData" :key="kpi.id">
+                            <div class="bg-white rounded-lg shadow-md p-6 border-l-4" :class="kpi.borderColor">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-600" x-text="kpi.label"></p>
+                                        <p class="text-3xl font-bold text-gray-900" x-text="kpi.value"></p>
+                                        <p class="text-sm mt-1" :class="kpi.changeColor" x-text="kpi.change"></p>
+                                    </div>
+                                    <div class="p-3 rounded-full" :class="kpi.iconBg">
+                                        <i :class="kpi.icon + ' text-xl'"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                                <i class="fas fa-chart-pie mr-2 text-lalalou-600"></i>Stock por Categoría
+                            </h3>
+                            <canvas id="stockChart" height="300"></canvas>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                                <i class="fas fa-chart-bar mr-2 text-lalalou-600"></i>Valor por Categoría
+                            </h3>
+                            <canvas id="valueChart" height="300"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Critical Products Table -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-exclamation-triangle mr-2 text-red-600"></i>Productos Críticos
+                        </h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Semanas</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <template x-for="product in criticalProducts" :key="product.id">
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" x-text="product.name"></td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" x-text="product.category"></td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="product.stock"></td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold" :class="product.weeksColor" x-text="product.weeks"></td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full" 
+                                                      :class="product.statusClass" x-text="product.status">
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload View -->
+                <div x-show="currentView === 'upload'" x-transition>
+                    <div class="max-w-4xl mx-auto">
+                        <!-- Upload Zone -->
+                        <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-6">
+                                <i class="fas fa-upload mr-2 text-lalalou-600"></i>Subir Archivos Excel
+                            </h3>
+                            
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-lalalou-400 transition-colors cursor-pointer"
+                                 @dragover.prevent @drop.prevent="handleFileDrop($event)" @click="$refs.fileInput.click()">
+                                <i class="fas fa-cloud-upload-alt text-6xl text-gray-400 mb-4"></i>
+                                <p class="text-xl font-medium text-gray-700 mb-2">Arrastra archivos Excel aquí</p>
+                                <p class="text-sm text-gray-500 mb-4">O haz click para seleccionar archivos</p>
+                                <p class="text-xs text-gray-400">Formatos soportados: .xlsx, .xls</p>
+                                <input type="file" multiple accept=".xlsx,.xls" class="hidden" x-ref="fileInput" @change="handleFileSelect($event)">
+                            </div>
+
+                            <!-- File List -->
+                            <div x-show="uploadedFiles.length > 0" class="mt-8">
+                                <h4 class="text-lg font-medium text-gray-800 mb-4">Archivos Procesados</h4>
+                                <div class="space-y-3">
+                                    <template x-for="file in uploadedFiles" :key="file.id">
+                                        <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
+                                            <div class="flex items-center space-x-4">
+                                                <i class="fas fa-file-excel text-green-600 text-xl"></i>
+                                                <div>
+                                                    <p class="font-medium text-gray-900" x-text="file.name"></p>
+                                                    <p class="text-sm text-gray-500" x-text="file.size + ' • ' + file.date"></p>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center space-x-4">
+                                                <span class="px-3 py-1 text-xs font-medium rounded-full" 
+                                                      :class="file.statusClass" x-text="file.status">
+                                                </span>
+                                                <button @click="removeFile(file.id)" class="text-red-600 hover:text-red-800">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Processing Status -->
+                        <div x-show="isProcessing" class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                            <div class="flex items-center">
+                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-4"></div>
+                                <div>
+                                    <h4 class="text-lg font-medium text-blue-800">Procesando archivos...</h4>
+                                    <p class="text-sm text-blue-600">Analizando datos y actualizando KPIs</p>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <div class="bg-blue-200 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                                         :style="'width: ' + processingProgress + '%'"></div>
+                                </div>
+                                <p class="text-xs text-blue-600 mt-1" x-text="processingProgress + '% completado'"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other Views (Products, Stock) -->
+                <div x-show="currentView === 'products'" x-transition>
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Análisis de Productos</h3>
+                        <p class="text-gray-600">Vista de análisis detallado de productos en desarrollo...</p>
+                    </div>
+                </div>
+
+                <div x-show="currentView === 'stock'" x-transition>
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Control de Stock</h3>
+                        <p class="text-gray-600">Vista de control detallado de stock en desarrollo...</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div x-show="loading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-8 text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-lalalou-600 mx-auto mb-4"></div>
+                <p class="text-lg font-medium text-gray-800">Cargando datos...</p>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div x-show="toast.show" x-transition 
+             class="fixed bottom-4 right-4 z-50 max-w-sm bg-white rounded-lg shadow-lg border-l-4"
+             :class="toast.type === 'success' ? 'border-green-500' : 'border-red-500'">
+            <div class="p-4">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i :class="toast.type === 'success' ? 'fas fa-check-circle text-green-400' : 'fas fa-exclamation-circle text-red-400'"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-900" x-text="toast.title"></p>
+                        <p class="text-sm text-gray-500" x-text="toast.message"></p>
+                    </div>
+                    <div class="ml-auto pl-3">
+                        <button @click="toast.show = false" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function lalalouDashboard() {
+            return {
+                sidebarOpen: false,
+                currentView: 'dashboard',
+                loading: false,
+                isProcessing: false,
+                processingProgress: 0,
+                lastUpdate: '13 Abril 2026',
+                uploadedFiles: [],
+                
+                // Toast notification system
+                toast: {
+                    show: false,
+                    type: 'success',
+                    title: '',
+                    message: ''
+                },
+
+                // KPI Data
+                kpiData: [
+                    {
+                        id: 1,
+                        label: 'Valor Total Stock',
+                        value: '$45.2M',
+                        change: '1,647 unidades totales',
+                        changeColor: 'text-lalalou-600',
+                        borderColor: 'border-lalalou-500',
+                        iconBg: 'bg-lalalou-100',
+                        icon: 'fas fa-dollar-sign text-lalalou-600'
+                    },
+                    {
+                        id: 2,
+                        label: 'Stock I26',
+                        value: '1,213',
+                        change: '74% del inventario',
+                        changeColor: 'text-green-600',
+                        borderColor: 'border-green-500',
+                        iconBg: 'bg-green-100',
+                        icon: 'fas fa-snowflake text-green-600'
+                    },
+                    {
+                        id: 3,
+                        label: 'Ventas 2 Sem',
+                        value: '186',
+                        change: '30 Mar - 12 Abr',
+                        changeColor: 'text-blue-600',
+                        borderColor: 'border-blue-500',
+                        iconBg: 'bg-blue-100',
+                        icon: 'fas fa-shopping-cart text-blue-600'
+                    },
+                    {
+                        id: 4,
+                        label: 'Tallas Críticas',
+                        value: '127',
+                        change: '≤1 semana stock',
+                        changeColor: 'text-red-600',
+                        borderColor: 'border-red-500',
+                        iconBg: 'bg-red-100',
+                        icon: 'fas fa-exclamation-triangle text-red-600'
+                    }
+                ],
+
+                // Critical Products
+                criticalProducts: [
+                    {
+                        id: 1,
+                        name: 'PANTALON BONE COTELE CRUDO',
+                        category: 'Pantalones',
+                        stock: 11,
+                        weeks: '0.85',
+                        weeksColor: 'text-red-600',
+                        status: 'Crítico',
+                        statusClass: 'bg-red-100 text-red-800'
+                    },
+                    {
+                        id: 2,
+                        name: 'BLAZER SOFIA NEGRO',
+                        category: 'Blazers',
+                        stock: 8,
+                        weeks: '0.92',
+                        weeksColor: 'text-red-600',
+                        status: 'Crítico',
+                        statusClass: 'bg-red-100 text-red-800'
+                    },
+                    {
+                        id: 3,
+                        name: 'SWEATER LIMA BEIGE',
+                        category: 'Sweaters',
+                        stock: 15,
+                        weeks: '1.2',
+                        weeksColor: 'text-yellow-600',
+                        status: 'Alerta',
+                        statusClass: 'bg-yellow-100 text-yellow-800'
+                    }
+                ],
+
+                init() {
+                    this.initCharts();
+                },
+
+                getViewTitle() {
+                    const titles = {
+                        dashboard: 'Dashboard Principal',
+                        products: 'Análisis de Productos',
+                        stock: 'Control de Stock',
+                        upload: 'Subir Archivos'
+                    };
+                    return titles[this.currentView] || 'Dashboard';
+                },
+
+                initCharts() {
+                    // Stock Chart
+                    const stockCtx = document.getElementById('stockChart');
+                    if (stockCtx) {
+                        new Chart(stockCtx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: ['Blazers y Chaquetas', 'Sweaters', 'Pantalones', 'Abrigos', 'Otros'],
+                                datasets: [{
+                                    data: [270, 324, 287, 71, 261],
+                                    backgroundColor: [
+                                        '#d375ff', '#9c37ff', '#6622cc', '#44178a', '#7c2ae8'
+                                    ]
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false
+                            }
+                        });
+                    }
+
+                    // Value Chart
+                    const valueCtx = document.getElementById('valueChart');
+                    if (valueCtx) {
+                        new Chart(valueCtx, {
+                            type: 'bar',
+                            data: {
+                                labels: ['Blazers', 'Sweaters', 'Pantalones', 'Abrigos', 'Otros'],
+                                datasets: [{
+                                    label: 'Valor (Millones $)',
+                                    data: [15.03, 12.8, 8.5, 11.32, 7.2],
+                                    backgroundColor: 'rgba(211, 117, 255, 0.8)'
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false
+                            }
+                        });
+                    }
+                },
+
+                async handleFileDrop(event) {
+                    const files = Array.from(event.dataTransfer.files);
+                    await this.processFiles(files);
+                },
+
+                async handleFileSelect(event) {
+                    const files = Array.from(event.target.files);
+                    await this.processFiles(files);
+                },
+
+                async processFiles(files) {
+                    if (files.length === 0) return;
+
+                    this.isProcessing = true;
+                    this.processingProgress = 0;
+
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        
+                        // Simulate processing
+                        await this.processExcelFile(file);
+                        this.processingProgress = Math.round(((i + 1) / files.length) * 100);
+                    }
+
+                    this.isProcessing = false;
+                    this.showToast('success', '¡Éxito!', `${files.length} archivo(s) procesado(s) correctamente`);
+                    
+                    // Update last update time
+                    this.lastUpdate = new Date().toLocaleDateString('es-ES');
+                    
+                    // Refresh charts and data
+                    setTimeout(() => {
+                        this.refreshDashboard();
+                    }, 1000);
+                },
+
+                async processExcelFile(file) {
+                    return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            try {
+                                const data = new Uint8Array(e.target.result);
+                                const workbook = XLSX.read(data, { type: 'array' });
+                                
+                                // Process Excel data
+                                const sheetNames = workbook.SheetNames;
+                                const processedData = {};
+                                
+                                sheetNames.forEach(sheetName => {
+                                    const worksheet = workbook.Sheets[sheetName];
+                                    processedData[sheetName] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                                });
+
+                                // Add to uploaded files list
+                                this.uploadedFiles.push({
+                                    id: Date.now() + Math.random(),
+                                    name: file.name,
+                                    size: this.formatFileSize(file.size),
+                                    date: new Date().toLocaleDateString('es-ES'),
+                                    status: 'Procesado',
+                                    statusClass: 'bg-green-100 text-green-800',
+                                    data: processedData
+                                });
+
+                                resolve();
+                            } catch (error) {
+                                console.error('Error processing file:', error);
+                                this.showToast('error', 'Error', 'Error al procesar el archivo Excel');
+                                resolve();
+                            }
+                        };
+                        reader.readAsArrayBuffer(file);
+                    });
+                },
+
+                refreshDashboard() {
+                    // Here you would update KPIs based on new data
+                    // For demo, we'll just show a success message
+                    this.showToast('success', 'Dashboard Actualizado', 'Los KPIs se han actualizado con los nuevos datos');
+                },
+
+                formatFileSize(bytes) {
+                    if (bytes === 0) return '0 Bytes';
+                    const k = 1024;
+                    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+                    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+                },
+
+                removeFile(fileId) {
+                    this.uploadedFiles = this.uploadedFiles.filter(file => file.id !== fileId);
+                },
+
+                showToast(type, title, message) {
+                    this.toast = {
+                        show: true,
+                        type: type,
+                        title: title,
+                        message: message
+                    };
+
+                    // Auto-hide after 5 seconds
+                    setTimeout(() => {
+                        this.toast.show = false;
+                    }, 5000);
+                },
+
+                exportData() {
+                    this.showToast('success', 'Exportando', 'Preparando archivo de exportación...');
+                    // Here you would implement actual export functionality
+                }
+            }
+        }
+    </script>
+</body>
+</html>
